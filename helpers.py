@@ -5,11 +5,6 @@ import boto3
 import random
 import pathlib
 
-
-AWS_ACCESS_KEY_ID = 'AKIAWB6CGDRGNF62QLPE'
-AWS_SECRET_ACCESS_KEY = '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'
-
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
