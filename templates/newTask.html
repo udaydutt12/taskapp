@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <!-- CKEditor 5 -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/25.0.0/classic/ckeditor.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <form method="POST" id="form" enctype="multipart/form-data">
+                <div class="mb-3">
+                        <input type="text" name="title" class="form-control" placeholder="title" value="{{title}}">
+                </div>
+                <div class="mb-3">
+                        <textarea name="description" class="form-control" placeholder="Description">{{ desc }}</textarea>
+                </div>
+                <div class="mb-3">
+                        <input type="file" name="image">
+                </div>
+                <div class="mb-3">
+                        <label for="severity">Severity</label>
+                        <select class="form-control" id="severity" name="severity">
+                                {% if severity == "1" %}
+                                <option value="1" aria-checked>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                {% elif severity == "2" %}
+                                <option value="1">1</option>
+                                <option value="2" aria-checked>2</option>
+                                <option value="3">3</option>
+                                {% elif severity == "3" %}
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" aria-checked>3</option>
+                                {% else %}
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                {% endif %}
+                         </select>
+                </div>
+                <div class="mb-3">
+                        <div id="editor" class="form-control">{{content}}</div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="submitForm();">Submit Task</button>
+        </form>
+    </div>
+    <script>
+            ClassicEditor
+                    .create( document.querySelector( '#editor' ) )
+                    .then( editor => {
+                            console.log( editor );
+                            window.editor = editor;
+                    } )
+                    .catch( error => {
+                            console.error( error );
+                    } );
+             function submitForm() {
+                var form = document.getElementById("form");
+                var input = document.createElement("input");
+                input.setAttribute("name", "content");
+                input.setAttribute("type", "hidden");
+                input.setAttribute("value", window.editor.getData());
+                form.appendChild(input);
+                form.submit();
+             }
+    </script>
+</body>
+</html>
