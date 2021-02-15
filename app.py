@@ -4,12 +4,6 @@ import requests
 import sqlite3
 from helpers import login_required, random_str, upload_s3
 
-GOOGLE_CLIENT_ID = '198393818811-aeufust8baj6toovagcee626g9t10pt5.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = 'WIQPPzJ7SlmA6CMXqn8jOZ1w'
-
-AWS_ACCESS_KEY_ID = 'AKIAWB6CGDRGNF62QLPE'
-AWS_SECRET_ACCESS_KEY = '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'
-
 # Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '\x14B~^\x07\xe1\x197\xda\x18\xa6[[\x05\x03QVg\xce%\xb2<\x80\xa4\x00'
