@@ -28,18 +28,18 @@ def validate_task(user_id, task_id):
 def new():
     if request.method == "POST":
         url = upload_s3(request)
-        print(request.form)
+        code = random_str()
         while True:
-            code = random_str()
             row = c.execute("Select * From tasks Where task_id=:id", {"id": code}).fetchall()
             if not row:
                 break
+            code = random_str()
         c.execute("Insert Into tasks (content, severity, image, title, description, task_id, user_id) Values (:content, :severity, :image, :title, :desc, :tid, :uid)", 
                    {"content": request.form.get('content'), "severity": request.form.get('severity'), "image": url, "title": request.form.get("title"), "desc": request.form.get("description"), "tid": code, "uid": session.get("user_id")}) 
         conn.commit()
-        return "success"
+        return redirect(f"/n/{code}")
     else:
-        return render_template("newTask.html")
+        return render_template("newTask.html", action="/new")
     
 @app.route("/login")
 def login():
@@ -69,17 +69,23 @@ def authorized():
         session["user_id"] = r["username"]
         session["name"] = r["name"]
         session["avatar"] = r["picture"]
-    return redirect("/home")
+    if session.get("next"):
+        return redirect(session.get("next"))
+    return redirect("/")
 
 @app.route("/")
 def index():
-    return "Hello World"
+    if session.get("user_id"):
+        tasks = c.execute("Select * From tasks Where user_id=:user_id", {"user_id": session.get("user_id")}).fetchall()
+        return render_template("index.html", tasks=tasks)
+    return render_template("signin.html")
+
 
 @app.route("/home")
 @login_required
 def home():
-    notes = c.execute("Select * from tasks where user_id=:user_id", {"user_id": session.get("user_id")}).fetchall()
-    return render_template("index.html", notes=notes)
+    tasks = c.execute("Select * from tasks where user_id=:user_id", {"user_id": session.get("user_id")}).fetchall()
+    return render_template("index.html", tasks=tasks)
 
 @app.route("/logout")
 def logout():
@@ -94,27 +100,27 @@ def aws():
     else:
         return "<form method='POST' enctype='multipart/form-data'><input type='file' name='image'><input type='submit'></form>"
 
-@app.route("/n/<string:task_id>")
+@app.route("/n/<task_id>")
 @login_required
 def view_task(task_id):
-    task = c.execute("Select * From tasks WHere task_id=:task_id and user_id=:user_id",
+    '''task = c.execute("Select * From tasks WHere task_id=:task_id and user_id=:user_id",
                     {"task_id": task_id, "user_id": session.get("user_id")}).fetchall()
     if len(task) == 1:
         print("1", task)
-        return render_template("task.html", task=task[0])
-    task = c.execute("Select * From tasks WHere task_id=:task_id",
-                    {"task_id": task_id, "user_id": session.get("user_id")}).fetchall()
+        return render_template("task.html", task=task[0])'''
+    task = c.execute("Select * From tasks Where task_id=:task_id",
+                    {"task_id": task_id}).fetchall()
     if len(task) == 1:
-        print("2", task)
         return render_template("task.html", task=task[0])
     abort(404)
 
 @app.route("/a/<user_id>")
 def view_author(user_id):
     # notes = c.execute("Select * From tasks Where user_id=:id and severity='2'", {'id': user_id}).fetchall()
-    notes = c.execute("Select * From tasks Where user_id=:id", {'id': user_id}).fetchall()
-    return render_template("author.html", notes= notes)
+    tasks = c.execute("Select * From tasks Where user_id=:id", {'id': user_id}).fetchall()
+    return render_template("author.html", tasks= tasks)
 
+# todo
 @app.route("/update/<task_id>", methods = ["GET", "POST"])
 def update_task(task_id):
     if validate_task(session.get("user_id"), task_id):
@@ -123,15 +129,14 @@ def update_task(task_id):
                 img = c.execute("select image from tasks where task_id=:id", {"id": task_id}).fetchall()[0][0]
             else:
                 img = upload_s3(request)
-            print("yp", img)
             c.execute("Update tasks Set title=:title, description=:desc, severity=:severity, content=:content, image=:image Where task_id=:tid",
                       {"title": request.form.get("title"), "content": request.form.get("content"), "severity": request.form.get("severity"),
                        "desc": request.form.get("desc"), "image": img, "tid": task_id})
             conn.commit()
             return redirect(f"/n/{task_id}")    
         else:
-            note = c.execute("Select * From tasks where task_id=:id", {"id": task_id}).fetchall()
-            return render_template("newTask.html", title=note[0][2], desc=note[0][3], severity=note[0][5], content=note[0][6])
+            task = c.execute("Select * From tasks where task_id=:id", {"id": task_id}).fetchall()
+            return render_template("newTask.html", title=task[0][2], desc=task[0][3], severity=task[0][5], content=task[0][6], image=task[0][4], action=f"/update/{task_id}")
     return "You can't update this task"
 
 @app.route("/search")
@@ -145,8 +150,6 @@ def search():
             #data.append([result[4], result[5], result[6], result[0], result[1], name])
             data.append((result[2], result[3], result[4], name, result[1], result[0]))
         return render_template("searched.html", data=data)
-    else:
-        return render_template("search.html")
 
 '''results = c.execute(f"SELECT * FROM tasks WHERE title LIKE '%{request.args.get('s')}%' AND status='Public'").fetchall()
     print(results)
@@ -156,14 +159,13 @@ def search():
         data.append([result[4], result[5], result[6], result[0], result[1], name])
     return render_template("searched.html", data=data)'''
 
-@app.route("/delete/<task_id>", methods=["GET", "POST"])
-def delete_task(task_id):
-    if validate_task(session.get("user_id"), task_id):
-        c.execute("Delete From tasks where task_id=:tid", {"tid": task_id})
+@app.route("/delete")
+def delete_task():
+    if validate_task(session.get("user_id"), request.args.get("n")):
+        c.execute("Delete From tasks where task_id=:tid", {"tid": request.args.get("n")})
         conn.commit()
-        return redirect("/home")
-    else:
-        return "You do not have permission to modify this task."
+        return redirect("/")
+    return "You do not have permission to modify this task."
 
 if __name__ == "__main__":
     app.run(port=5000)
