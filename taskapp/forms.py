@@ -23,6 +23,6 @@ class TaskForm(FlaskForm):
         if self.status == "Complete":
             return True
         if due_date.data < dt.now().date():
-             raise ValidationError("Cannot select a due date"\
-                                   "from the past")
+             raise ValidationError("Cannot select a due date "\
+                                   "from the past.")
         return True
