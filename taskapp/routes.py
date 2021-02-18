@@ -12,6 +12,7 @@ GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET')
 redirect_uri = getenv('REDIRECT_URI')
 
 @app.route("/orderupdate",methods=["POST"])
+@login_required
 def orderupdate():  
     user = User.query.get(session["user_id"])
     tasks = user.tasks
@@ -24,6 +25,7 @@ def orderupdate():
     return redirect("/")
     
 @app.route("/update/<task_id>", methods = ["GET", "POST"])
+@login_required
 def update_task(task_id):
     task = Task.query.get(task_id)
     if task.author.id != session["user_id"]:
