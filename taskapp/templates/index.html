@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block main %}
     <div class="container">
+        {% if incomplete_tasks|length + complete_tasks|length == 0 %}
+            <h3> You don't have any tasks. Why don't you <a href="/new">create one</a>?</h3><br><br>
+        {% endif %}
         <div class="row">
-            {% if incomplete_tasks|length + complete_tasks|length == 0 %}
-                <h3> You don't have any tasks. Why don't you <a href="/new">create one</a>?</h3><br><br>
-            {% endif %}
             <div class="col-sm sortable">
                 <h4>Incomplete Tasks</h4>
                 {% for task in incomplete_tasks %}
