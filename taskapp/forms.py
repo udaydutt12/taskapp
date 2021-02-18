@@ -20,7 +20,6 @@ class TaskForm(FlaskForm):
     submit = SubmitField("Create Task")
 
     def validate_due_date(self, due_date):
-        # self.due_date.date = YYYY-mm-dd
         if self.status == "Complete":
             return True
         if due_date.data < dt.now().date():
