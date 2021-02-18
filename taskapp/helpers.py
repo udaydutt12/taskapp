@@ -28,6 +28,7 @@ def upload_s3(request):
                         aws_access_key_id= AWS_ACCESS_KEY_ID, 
                         aws_secret_access_key= AWS_SECRET_ACCESS_KEY)
     name = random_str()
-    bucket = s3.Bucket("taskapp12").put_object(Key=f"{name}.{pathlib.Path(request.files['image'].filename).suffix}",
+    bucket = s3.Bucket("taskapp12").put_object(Key=f"{name}."\
+                      f"{pathlib.Path(request.files['image'].filename).suffix}",
                       Body=request.files['image'],ACL="public-read")
     return f"{name}.{pathlib.Path(request.files['image'].filename).suffix}"
