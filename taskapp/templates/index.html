@@ -3,7 +3,7 @@
     <div class="container">
         <div class="row">
             {% if incomplete_tasks|length + complete_tasks|length == 0 %}
-                <h3> You don't have any tasks. Why don't you <a href="/new">create one</a>?</h3>
+                <h3> You don't have any tasks. Why don't you <a href="/new">create one</a>?</h3><br><br>
             {% endif %}
             <div class="col-sm sortable">
                 <h4>Incomplete Tasks</h4>
@@ -67,41 +67,40 @@
       </div>
       <script>
         $('#exampleModal').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget) // Button that triggered the modal
-      var name = button.data('name') // Extract info from data-* attributes
-      var id = button.data("id")
-      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-      var modal = $(this)
-      modal.find('.modal-title').text(`Confirm deletion: ${name}`)
-      modal.find('.modal-body').html(`Are you sure you want to delete <b>${name}</b>? This action can't be undone. But if you are sure, press that red button to delete ${name}.`)
-      modal.find(".btn-danger").text(`Delete ${name}`)
-      document.getElementById("delete").onclick = () => {
-        location.assign(`/delete?n=${id}`)
-      }
-    })
-      </script>
-<script>
-$(document).ready(function(){   
-    $(".sortable").sortable({      
-        update: function( event, ui ) {
-            updateOrder();
-        }
-    });  
-}); 
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var name = button.data('name') // Extract info from data-* attributes
+          var id = button.data("id")
+          // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+          // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+          var modal = $(this)
+          modal.find('.modal-title').text(`Confirm deletion: ${name}`)
+          modal.find('.modal-body').html(`Are you sure you want to delete <b>${name}</b>? This action can't be undone. But if you are sure, press that red button to delete ${name}.`)
+          modal.find(".btn-danger").text(`Delete ${name}`)
+          document.getElementById("delete").onclick = () => {
+            location.assign(`/delete?n=${id}`)
+          }
+        })
+      
+        $(document).ready(function(){   
+            $(".sortable").sortable({      
+                update: function( event, ui ) {
+                    updateOrder();
+                }
+            });  
+        }); 
 
-function updateOrder() {    
-  var item_order = new Array();
-  $('div.col-sm .card').each(function() {
-      item_order.push($(this).attr("id"));
-  });
-  var order_string = 'order='+item_order;
-  $.ajax({
-      method: "POST",
-      url: "/orderupdate",
-      data: order_string,
-      cache: false
-  });
-}
-</script> 
+        function updateOrder() {    
+          var item_order = new Array();
+          $('div.col-sm .card').each(function() {
+              item_order.push($(this).attr("id"));
+          });
+          var order_string = 'order='+item_order;
+          $.ajax({
+              method: "POST",
+              url: "/orderupdate",
+              data: order_string,
+              cache: false
+          });
+        }
+    </script> 
 {% endblock %}
