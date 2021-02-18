@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block main %}
+
+  <article class="media content-section">
+    {% if task.image_url is not none %}
+    <img class="rounded-circle article-img" src="https://taskapp12.s3.amazonaws.com/{{task.image_url}}">
+    {% else %}
+    <img class="rounded-circle article-img" src="/static/logo.png">
+    {% endif %}
+    <div class="media-body">
+      <div class="article-metadata">
+        <h1 class="mr-2">Created By: {{ task.author.name }}</h1>
+      </div>
+      <h2 class="article-title">Title: {{ task.title }}</h2><br>
+      <h4>Due Date: {{task.due_date}}</h3><br>
+      <h4>Status: {{task.status}}</h3><br>
+      <p class="article-content">{{ task.content|safe }}</p>
+    </div>
+  </article>
+{% endblock %}
