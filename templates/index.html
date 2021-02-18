@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% block main %}
+    <div class="container">
+        <div class="row">
+            {% if incomplete_tasks|length + complete_tasks|length == 0 %}
+                <h3> You don't have any tasks. Why don't you <a href="/new">create one</a>?</h3>
+            {% endif %}
+            <div class="col-sm sortable">
+                <h4>Incomplete Tasks</h4>
+                {% for task in incomplete_tasks %}
+                <div class="card ui-state-default" id="{{task.id}}" style="width: 18rem; margin-right: 50px; margin-bottom: 10px">
+                    {% if task.image_url is not none %}
+                    <img class="card-img-top" src="https://taskapp12.s3.amazonaws.com/{{task.image_url}}" height="200px" alt="...">
+                    {% else %}
+                    <img class="card-img-top" src="/static/logo.png" height="200px" alt="...">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.title}}</h5>
+                        <p class="card-text">{{task.due_date}}</p>
+                        <a href="/n/{{ task.id }}" class="card-link"><i class="fas fa-book-open"></i></a>
+                        <a href="/" class="card-link" style="color: red" data-toggle="modal" data-target="#exampleModal" data-name="{{ task.title }}" data-id="{{ task.id }}"><i class="fas fa-trash-alt"></i></a>
+                        <a href="/update/{{ task.id }}" class="card-link"><i class="far fa-edit"></i></a>
+                    </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div class="col-sm sortable">
+                <h4>Completed Tasks</h4>
+                {% for task in complete_tasks %}
+                <div class="card ui-state-default" id="{{task.id}}" style="width: 18rem; margin-right: 50px; margin-bottom: 10px">
+                    {% if task.image_url is not none %}
+                    <img class="card-img-top" src="https://taskapp12.s3.amazonaws.com/{{task.image_url}}" height="200px" alt="...">
+                    {% else %}
+                    <img class="card-img-top" src="/static/logo.png" height="200px" alt="...">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ task.title}}</h5>
+                        <p class="card-text">{{task.due_date}}</p>
+                        <a href="/n/{{ task.id }}" class="card-link"><i class="fas fa-book-open"></i></a>
+                        <a href="/" class="card-link" style="color: red" data-toggle="modal" data-target="#exampleModal" data-name="{{ task.title }}" data-id="{{ task.id }}"><i class="fas fa-trash-alt"></i></a>
+                        <a href="/update/{{ task.id }}" class="card-link"><i class="far fa-edit"></i></a>
+                    </div>
+                </div>
+              {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete this post?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger" onclick="" id="delete"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        $('#exampleModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var name = button.data('name') // Extract info from data-* attributes
+      var id = button.data("id")
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modal = $(this)
+      modal.find('.modal-title').text(`Confirm deletion: ${name}`)
+      modal.find('.modal-body').html(`Are you sure you want to delete <b>${name}</b>? This action can't be undone. But if you are sure, press that red button to delete ${name}.`)
+      modal.find(".btn-danger").text(`Delete ${name}`)
+      document.getElementById("delete").onclick = () => {
+        location.assign(`/delete?n=${id}`)
+      }
+    })
+      </script>
+<script>
+$(document).ready(function(){   
+    $(".sortable").sortable({      
+        update: function( event, ui ) {
+            updateOrder();
+        }
+    });  
+}); 
+
+function updateOrder() {    
+  var item_order = new Array();
+  $('div.col-sm .card').each(function() {
+      item_order.push($(this).attr("id"));
+  });
+  var order_string = 'order='+item_order;
+  $.ajax({
+      method: "POST",
+      url: "/orderupdate",
+      data: order_string,
+      cache: false
+  });
+}
+</script> 
+{% endblock %}
