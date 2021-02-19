@@ -50,7 +50,7 @@ def update_task(task_id):
         form.status.data = task.status
         form.due_date.data = task.due_date
     return render_template("new.html", form=form, title="Update Task",
-                           action=f"/update/{task_id}")
+                           title_text="Update", action=f"/update/{task_id}")
 
 
 @app.route("/new", methods=["GET", "POST"])
@@ -74,7 +74,8 @@ def new():
         db.session.commit()
         flash('Your task has been published!', 'success')
         return redirect(f"/n/{task.id}") 
-    return render_template("new.html", title="New Task",form=form)
+    return render_template("new.html", title="New Task",
+                           title_text="Create a new", form=form)
 
 @app.route("/n/<task_id>")
 @login_required
@@ -149,7 +150,7 @@ def authorized():
         return redirect(session.get("next"))
     return redirect("/")
 
-
+@login_required
 @app.route("/logout")
 def logout():
     session.clear()
