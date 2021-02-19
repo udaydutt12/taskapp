@@ -35,7 +35,7 @@
                 {{ form.image.label(class="form-control-label") }}
                 {{ form.image(class="form-control") }}
                 {% if form.image.errors %}
-                    {% for error in form.picture.errors %}
+                    {% for error in form.image.errors %}
                         <span class="text-danger">{{ error }}</span></br>
                     {% endfor %}
                 {% endif %}
