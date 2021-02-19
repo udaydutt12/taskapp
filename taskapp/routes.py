@@ -10,6 +10,7 @@ from os import getenv
 GOOGLE_CLIENT_ID = getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = getenv('GOOGLE_CLIENT_SECRET')
 redirect_uri = getenv('REDIRECT_URI')
+token = {}
 
 @app.route("/orderupdate",methods=["POST"])
 @login_required
@@ -122,6 +123,7 @@ def authorized():
                              "grant_type": "authorization_code",
                              "redirect_uri": redirect_uri})
     access_token = r.json()["access_token"]
+    token["access_token"] = access_token
     response = requests.get(f"https://www.googleapis.com/oauth2/v2/userinfo"\
                             f"?access_token={access_token}").json()
     user = User.query.get(response["id"])
@@ -153,6 +155,13 @@ def authorized():
 @login_required
 @app.route("/logout")
 def logout():
+    if "access_token" in token:
+        resp = requests.post(
+        'https://oauth2.googleapis.com/revoke',
+        params={"token": token["access_token"]},
+        headers = {'content-type': 'application/x-www-form-urlencoded'}
+        )
+        del token["access_token"]
     session.clear()
     return redirect("/")
 
