@@ -18,7 +18,7 @@
                         <h5 class="card-title">{{ task.title}}</h5>
                         <p class="card-text">{{task.due_date}}</p>
                         <a href="/n/{{ task.id }}" class="card-link"><i class="fas fa-book-open"></i></a>
-                        <a href="/" class="card-link" style="color: red" data-toggle="modal" data-target="#exampleModal" data-name="{{ task.title }}" data-id="{{ task.id }}"><i class="fas fa-trash-alt"></i></a>
+                        <a href="/" class="card-link" style="color: red" data-toggle="modal" data-target="#ModalDelete" data-name="{{ task.title }}" data-id="{{ task.id }}"><i class="fas fa-trash-alt"></i></a>
                         <a href="/update/{{ task.id }}" class="card-link"><i class="far fa-edit"></i></a>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
                         <h5 class="card-title">{{ task.title}}</h5>
                         <p class="card-text">{{task.due_date}}</p>
                         <a href="/n/{{ task.id }}" class="card-link"><i class="fas fa-book-open"></i></a>
-                        <a href="/" class="card-link" style="color: red" data-toggle="modal" data-target="#exampleModal" data-name="{{ task.title }}" data-id="{{ task.id }}"><i class="fas fa-trash-alt"></i></a>
+                        <a href="/" class="card-link" style="color: red" data-toggle="modal" data-target="#ModalDelete" data-name="{{ task.title }}" data-id="{{ task.id }}"><i class="fas fa-trash-alt"></i></a>
                         <a href="/update/{{ task.id }}" class="card-link"><i class="far fa-edit"></i></a>
                     </div>
                 </div>
@@ -46,11 +46,11 @@
         </div>
     </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="ModalDelete" tabindex="-1" aria-labelledby="ModalDeleteLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <h5 class="modal-title" id="ModalDeleteLabel">Delete Task</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -66,7 +66,7 @@
         </div>
       </div>
       <script>
-        $('#exampleModal').on('show.bs.modal', function (event) {
+        $('#ModalDelete').on('show.bs.modal', function (event) {
           var button = $(event.relatedTarget) // Button that triggered the modal
           var name = button.data('name') // Extract info from data-* attributes
           var id = button.data("id")
@@ -82,7 +82,8 @@
         })
       
         $(document).ready(function(){   
-            $(".sortable").sortable({      
+            $(".sortable").sortable({
+                items: 'div.card',
                 update: function( event, ui ) {
                     updateOrder();
                 }
