@@ -17,7 +17,7 @@ class TaskForm(FlaskForm):
     status = SelectField("Task Status", choices=["Incomplete", 
                          "Complete"], validators=[DataRequired()])
     content = StringField("Content", widget=TextArea())
-    submit = SubmitField("Create Task")
+    submit = SubmitField("Submit")
 
     def validate_due_date(self, due_date):
         if self.status == "Complete":
